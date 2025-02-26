@@ -1,66 +1,28 @@
-# Michael Shafae
-# CPSC 386-01
-# 2050-01-01
-# mshafae@csu.fullerton.edu
-# @mshafae
-#
-# Lab 00-00
-#
-# Partners:
-#
-# This my first program and it prints out Hello World!
-#
 
 """Scene objects for making games with PyGame."""
 
 import os
 import random
 import pygame
-import assets
-import rgbcolors
-
+from videogame import assets
+from videogame import rgbcolors
 
 # If you're interested in using abstract base classes, feel free to rewrite
 # these classes.
 # For more information about Python Abstract Base classes, see
-# https://docs.python.org/3.8/library/abc.html
-
-class SceneManager:
-    def __init__(self):
-        self._scene_dict = {}
-        self._current_scene = None
-        self._next_scene = None
-        # This is a safety to ensure that calling
-        # next() twice in a row without calling set_next_scene()
-        # will raise StopIteration.
-        self._reloaded = True
-
-    def set_next_scene(self, key):
-        self._next_scene = self._scene_dict[key]
-        self._reloaded = True
-
-    def add(self, scene_list):
-        for (index, scene) in enumerate(scene_list):
-            self._scene_dict[str(index)] = scene
-        self._current_scene = self._scene_dict['0']
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self._next_scene and self._reloaded:
-            self._reloaded = False
-            return self._next_scene
-        else:
-            raise StopIteration
+# https://docs.python.org/3.12/library/abc.html
+# and
+# https://peps.python.org/pep-3119/
 
 class Scene:
     """Base class for making PyGame Scenes."""
 
-    def __init__(self, screen, background_color, soundtrack=None):
+    def __init__(self, screen, background_color, screen_flags=None, soundtrack=None):
         """Scene initializer"""
         self._screen = screen
-        self._background = pygame.Surface(self._screen.get_size())
+        if not screen_flags:
+            screen_flags = pygame.SCALED
+        self._background = pygame.Surface(self._screen.get_size(), flags=screen_flags)
         self._background.fill(background_color)
         self._frame_rate = 60
         self._is_valid = True
@@ -97,11 +59,11 @@ class Scene:
         if self._soundtrack:
             try:
                 pygame.mixer.music.load(self._soundtrack)
-                pygame.mixer.music.set_volume(0.5)
+                pygame.mixer.music.set_volume(0.2)
             except pygame.error as pygame_error:
                 print("\n".join(pygame_error.args))
                 raise SystemExit("broken!!") from pygame_error
-            pygame.mixer.music.play(-1)
+            pygame.mixer.music.play(loops=-1, fade_ms=500)
 
     def end_scene(self):
         """End the scene."""
@@ -124,15 +86,21 @@ class PressAnyKeyToExitScene(Scene):
             self._is_valid = False
 
 
-class Circle:
+class Circle(pygame.Surface):
     """Class representing a circle with a bounding rect."""
 
     def __init__(self, center, radius, color, name="None"):
+        width = 2 * radius
+        super().__init__((width, width))
+        # center in window coordinates
         self._center = pygame.math.Vector2(center)
+        # center in local surface coordinates
+        center = (radius, radius)
         self._radius = radius
         self._color = color
         self._name = name
-        self._is_exploding = False
+        # draw a circle in the center of the self surface
+        pygame.draw.circle(self, self._color, center, self.radius)
 
     @property
     def radius(self):
@@ -141,38 +109,46 @@ class Circle:
 
     @property
     def center(self):
-        """Return the circle's center."""
+        """Return the circle's center in window coordinates."""
         return self._center
 
+    def get_rect(self):
+        """Return bounding rect."""
+        # left = self._center.x - self._radius
+        # top = self._center.y - self._radius
+        # width = 2 * self._radius
+        return super().get_rect(center=(self._center.x, self._center.y))
+        
     @property
     def rect(self):
         """Return bounding rect."""
-        left = self._center.x - self._radius
-        top = self._center.y - self._radius
-        width = 2 * self._radius
-        return pygame.Rect(left, top, width, width)
+        return self.get_rect()
+        # left = self._center.x - self._radius
+        # top = self._center.y - self._radius
+        # width = 2 * self._radius
+        # return pygame.Rect(left, top, width, width)
 
-    @property
-    def width(self):
-        """Return the width of the bounding box the circle is in."""
-        return 2 * self._radius
+    # @property
+    # def width(self):
+    #     """Return the width of the bounding box the circle is in."""
+    #     return 2 * self._radius
+   
+    # @property
+    # def height(self):
+    #     """Return the height of the bounding box the circle is in."""
+    #     return 2 * self._radius
+   
+    # @property
+    # def is_exploding(self):
+    #     return self._is_exploding
 
-    @property
-    def height(self):
-        """Return the height of the bounding box the circle is in."""
-        return 2 * self._radius
+    # @is_exploding.setter
+    # def is_exploding(self, val):
+    #     self._is_exploding = val
 
-    @property
-    def is_exploding(self):
-        return self._is_exploding
-
-    @is_exploding.setter
-    def is_exploding(self, val):
-        self._is_exploding = val
-
-    def draw(self, screen):
-        """Draw the circle to screen."""
-        pygame.draw.circle(screen, self._color, self.center, self.radius)
+    # def draw(self, screen):
+    #     """Draw the circle to screen."""
+    #     pygame.draw.circle(screen, self._color, self.center, self.radius)
 
     def __repr__(self):
         """Circle stringify."""
@@ -181,7 +157,7 @@ class Circle:
 
 class CircleScene(PressAnyKeyToExitScene):
     def __init__(self, screen, scene_manager, color):
-        super().__init__(screen, rgbcolors.black, assets.get('soundtrack'))
+        super().__init__(screen, rgbcolors.black, soundtrack=assets.get('soundtrack'))
         self._scene_manager = scene_manager
         (width, height) = self._screen.get_size()
         self._circle = Circle(pygame.math.Vector2(width // 2, height // 2), 200, color, name=str(id(self)))
@@ -189,7 +165,8 @@ class CircleScene(PressAnyKeyToExitScene):
 
     def draw(self):
         super().draw()
-        self._circle.draw(self._screen)
+        self._screen.blit(self._circle, self._circle.rect)
+        # self._circle.draw(self._screen)
 
     def end_scene(self):
         super().end_scene()
@@ -229,7 +206,7 @@ class BlinkingTitle(PressAnyKeyToExitScene):
     def __init__(
         self, screen, scene_manager, message, color, size, background_color
     ):
-        super().__init__(screen, background_color, assets.get('soundtrack'))
+        super().__init__(screen, background_color, soundtrack=assets.get('soundtrack'))
         self._scene_manager = scene_manager
         self._message_color = color
         self._message_complement_color = (
