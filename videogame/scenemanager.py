@@ -1,6 +1,7 @@
 
+"""A class to manage transitions from one scene to another."""
 
-class SceneManager:
+class SceneManagerDict:
     def __init__(self):
         self._scene_dict = {}
         self._current_scene = None
@@ -28,3 +29,13 @@ class SceneManager:
             return self._next_scene
         else:
             raise StopIteration
+
+class SceneManager:
+    def __init__(self, scenes_list=None):
+        self._scenes = scenes_list
+        self._current_scene = None
+        self._next_scene = None
+    def __iter__(self):
+        return iter(self._scenes)
+    def add(self, scene):
+        self._scenes.append(scene)

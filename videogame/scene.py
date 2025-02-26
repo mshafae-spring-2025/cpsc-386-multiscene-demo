@@ -174,8 +174,8 @@ class CircleScene(PressAnyKeyToExitScene):
 
     def process_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
-            self._next_key = random.choice('0 1 2 3'.split())
-            self._scene_manager.set_next_scene(self._next_key)
+            # self._next_key = random.choice('0 1 2 3'.split())
+            # self._scene_manager.set_next_scene(self._next_key)
             self._is_valid = False
         else:
             super().process_event(event)
@@ -258,16 +258,21 @@ class BlinkingTitle(PressAnyKeyToExitScene):
         self._is_valid = True
 
     def process_event(self, event):
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
-            self._scene_manager.set_next_scene('2')
-            self._is_valid = False
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-            self._scene_manager.set_next_scene('3')
-            self._is_valid = False
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
-            self._next_key = random.choice('0 1 2 3'.split())
-            self._scene_manager.set_next_scene(self._next_key)
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
             self._is_valid = False
         else:
             super().process_event(event)
+        
+        # if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
+        #     self._scene_manager.set_next_scene('2')
+        #     self._is_valid = False
+        # elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+        #     self._scene_manager.set_next_scene('3')
+        #     self._is_valid = False
+        # elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+        #     self._next_key = random.choice('0 1 2 3'.split())
+        #     self._scene_manager.set_next_scene(self._next_key)
+        #     self._is_valid = False
+        # else:
+        #     super().process_event(event)
 

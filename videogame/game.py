@@ -59,12 +59,7 @@ class MultiSceneGameDemo(VideoGame):
     def __init__(self):
         """Init the Pygame demo."""
         super().__init__(window_title="Multi Scene Demo")
-        self._scene_manager = scenemanager.SceneManager()
-        self._build_scenes()
-
-    def _build_scenes(self):
-        """Build scene graph for the game demo."""
-        self._scene_manager.add(
+        self._scene_manager = scenemanager.SceneManager(
             [
                 scene.BlinkingTitle(
                     self._screen,
@@ -79,7 +74,26 @@ class MultiSceneGameDemo(VideoGame):
                 scene.BlueCircleScene(self._screen, self._scene_manager),
             ]
         )
-        self._scene_manager.set_next_scene('0')
+        # self._build_scenes()
+
+    # def _build_scenes(self):
+    #     """Build scene graph for the game demo."""
+    #     self._scene_manager.add(
+    #         [
+    #             scene.BlinkingTitle(
+    #                 self._screen,
+    #                 self._scene_manager,
+    #                 "Multi Scene Demo",
+    #                 rgbcolors.orange,
+    #                 72,
+    #                 rgbcolors.black,
+    #             ),
+    #             scene.RedCircleScene(self._screen, self._scene_manager),
+    #             scene.GreenCircleScene(self._screen, self._scene_manager),
+    #             scene.BlueCircleScene(self._screen, self._scene_manager),
+    #         ]
+    #     )
+    #     self._scene_manager.set_next_scene('0')
 
     def run(self):
         """Run the game; the main game loop."""
