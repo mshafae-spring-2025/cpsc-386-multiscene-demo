@@ -36,4 +36,6 @@ def get(key):
         )
         raise
     value = path.join(data_dir, value)
+    # Make sure the path exists
+    assert path.exists(value)
     return value

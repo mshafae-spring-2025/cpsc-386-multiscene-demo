@@ -41,11 +41,6 @@ class VideoGame:
             pygame.mixer.init()
         self._scene_manager = None
 
-    # @property
-    # def scene_manager(self):
-    #     """Return the scene manager."""
-    #     return _scene_manager
-
     def run(self):
         """Run the game; the main game loop."""
         raise NotImplementedError
@@ -74,26 +69,6 @@ class MultiSceneGameDemo(VideoGame):
                 scene.BlueCircleScene(self._screen, self._scene_manager),
             ]
         )
-        # self._build_scenes()
-
-    # def _build_scenes(self):
-    #     """Build scene graph for the game demo."""
-    #     self._scene_manager.add(
-    #         [
-    #             scene.BlinkingTitle(
-    #                 self._screen,
-    #                 self._scene_manager,
-    #                 "Multi Scene Demo",
-    #                 rgbcolors.orange,
-    #                 72,
-    #                 rgbcolors.black,
-    #             ),
-    #             scene.RedCircleScene(self._screen, self._scene_manager),
-    #             scene.GreenCircleScene(self._screen, self._scene_manager),
-    #             scene.BlueCircleScene(self._screen, self._scene_manager),
-    #         ]
-    #     )
-    #     self._scene_manager.set_next_scene('0')
 
     def run(self):
         """Run the game; the main game loop."""

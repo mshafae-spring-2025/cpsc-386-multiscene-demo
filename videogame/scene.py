@@ -1,8 +1,5 @@
-
 """Scene objects for making games with PyGame."""
 
-import os
-import random
 import pygame
 from videogame import assets
 from videogame import rgbcolors
@@ -14,15 +11,20 @@ from videogame import rgbcolors
 # and
 # https://peps.python.org/pep-3119/
 
+
 class Scene:
     """Base class for making PyGame Scenes."""
 
-    def __init__(self, screen, background_color, screen_flags=None, soundtrack=None):
+    def __init__(
+        self, screen, background_color, screen_flags=None, soundtrack=None
+    ):
         """Scene initializer"""
         self._screen = screen
         if not screen_flags:
             screen_flags = pygame.SCALED
-        self._background = pygame.Surface(self._screen.get_size(), flags=screen_flags)
+        self._background = pygame.Surface(
+            self._screen.get_size(), flags=screen_flags
+        )
         self._background.fill(background_color)
         self._frame_rate = 60
         self._is_valid = True
@@ -99,6 +101,7 @@ class Circle(pygame.Surface):
         self._radius = radius
         self._color = color
         self._name = name
+        self.fill(rgbcolors.white)
         # draw a circle in the center of the self surface
         pygame.draw.circle(self, self._color, center, self.radius)
 
@@ -114,99 +117,73 @@ class Circle(pygame.Surface):
 
     def get_rect(self):
         """Return bounding rect."""
-        # left = self._center.x - self._radius
-        # top = self._center.y - self._radius
-        # width = 2 * self._radius
         return super().get_rect(center=(self._center.x, self._center.y))
-        
+
     @property
     def rect(self):
         """Return bounding rect."""
         return self.get_rect()
-        # left = self._center.x - self._radius
-        # top = self._center.y - self._radius
-        # width = 2 * self._radius
-        # return pygame.Rect(left, top, width, width)
-
-    # @property
-    # def width(self):
-    #     """Return the width of the bounding box the circle is in."""
-    #     return 2 * self._radius
-   
-    # @property
-    # def height(self):
-    #     """Return the height of the bounding box the circle is in."""
-    #     return 2 * self._radius
-   
-    # @property
-    # def is_exploding(self):
-    #     return self._is_exploding
-
-    # @is_exploding.setter
-    # def is_exploding(self, val):
-    #     self._is_exploding = val
-
-    # def draw(self, screen):
-    #     """Draw the circle to screen."""
-    #     pygame.draw.circle(screen, self._color, self.center, self.radius)
-
-    def __repr__(self):
-        """Circle stringify."""
-        return f'Circle({self._center}, {self._radius}, {self._color}, "{self._name}")'
 
 
 class CircleScene(PressAnyKeyToExitScene):
+    """A scene showing a colored circle in the center."""
+
     def __init__(self, screen, scene_manager, color):
-        super().__init__(screen, rgbcolors.black, soundtrack=assets.get('soundtrack'))
+        super().__init__(
+            screen, rgbcolors.black, soundtrack=assets.get('soundtrack')
+        )
         self._scene_manager = scene_manager
         (width, height) = self._screen.get_size()
-        self._circle = Circle(pygame.math.Vector2(width // 2, height // 2), 200, color, name=str(id(self)))
-        self._next_key = '0'
+        self._circle = Circle(
+            pygame.math.Vector2(width // 2, height // 2),
+            200,
+            color,
+            name=str(id(self)),
+        )
 
     def draw(self):
         super().draw()
         self._screen.blit(self._circle, self._circle.rect)
-        # self._circle.draw(self._screen)
-
-    def end_scene(self):
-        super().end_scene()
-        self._is_valid = True
-
-    def process_event(self, event):
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
-            # self._next_key = random.choice('0 1 2 3'.split())
-            # self._scene_manager.set_next_scene(self._next_key)
-            self._is_valid = False
-        else:
-            super().process_event(event)
 
 
 # Scene 1
 class RedCircleScene(CircleScene):
+    """A scene with a big red circle."""
+
     def __init__(self, screen, scene_manager):
         super().__init__(screen, scene_manager, rgbcolors.red)
         self._next_key = '2'
 
+
 # Scene 2
 class GreenCircleScene(CircleScene):
+    """A scene with a big green circle."""
+
     def __init__(self, screen, scene_manager):
         super().__init__(screen, scene_manager, rgbcolors.green)
         self._next_key = '3'
 
+
 # Scene 3
 class BlueCircleScene(CircleScene):
+    """A scene with a big blue circle."""
+
     def __init__(self, screen, scene_manager):
         super().__init__(screen, scene_manager, rgbcolors.blue)
         self._next_key = '1'
+
 
 # Scene 0
 class BlinkingTitle(PressAnyKeyToExitScene):
     """A scene with blinking text."""
 
+    # pylint: disable-next=too-many-arguments,too-many-positional-arguments
     def __init__(
         self, screen, scene_manager, message, color, size, background_color
     ):
-        super().__init__(screen, background_color, soundtrack=assets.get('soundtrack'))
+        super().__init__(
+            screen, background_color, soundtrack=assets.get('soundtrack')
+        )
         self._scene_manager = scene_manager
         self._message_color = color
         self._message_complement_color = (
@@ -252,27 +229,3 @@ class BlinkingTitle(PressAnyKeyToExitScene):
         press_any_key_pos = press_any_key.get_rect(center=(w / 2, h - 50))
         self._screen.blit(presskey, presskey_pos)
         self._screen.blit(press_any_key, press_any_key_pos)
-
-    def end_scene(self):
-        super().end_scene()
-        self._is_valid = True
-
-    def process_event(self, event):
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
-            self._is_valid = False
-        else:
-            super().process_event(event)
-        
-        # if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
-        #     self._scene_manager.set_next_scene('2')
-        #     self._is_valid = False
-        # elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-        #     self._scene_manager.set_next_scene('3')
-        #     self._is_valid = False
-        # elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
-        #     self._next_key = random.choice('0 1 2 3'.split())
-        #     self._scene_manager.set_next_scene(self._next_key)
-        #     self._is_valid = False
-        # else:
-        #     super().process_event(event)
-
